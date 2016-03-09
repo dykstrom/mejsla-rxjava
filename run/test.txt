@@ -1,0 +1,4 @@
+This is the first line. And it has 5 - 3 sentences.
+And this line is line number 2. This line has 2 sentences too.
+Look, there is one more line, and that is the third line. A this line is a bit longer, but it also has 2 sentences.
+Now we have come to the fourth line, also called line number 4, and it is the last line.
