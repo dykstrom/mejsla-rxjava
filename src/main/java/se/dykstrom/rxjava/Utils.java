@@ -1,12 +1,28 @@
 package se.dykstrom.rxjava;
 
 import rx.Observable;
+import rx.Subscription;
+import rx.subscriptions.Subscriptions;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class Utils {
+
+    /**
+     * Returns the greatest common divisor (GCD) of a and b.
+     */
+    public static int gcd(int a, int b) {
+        if (b == 0) {
+            return a;
+        } else {
+            return gcd(b, a % b);
+        }
+    }
 
     /**
      * Runs the given runnable, and returns the time it took for the runnable to complete,
@@ -42,8 +58,10 @@ public final class Utils {
      */
     public static Observable<String> fromFile(File file) {
         return Observable.create(subscriber -> {
-            try {
-                Files.lines(file.toPath()).forEach(line -> {
+            try (Stream<String> stream = Files.lines(file.toPath())) {
+                // Make sure the stream is closed when the subscriber unsubscribes
+                subscriber.add(Subscriptions.create(stream::close));
+                stream.forEach(line -> {
                     if (!subscriber.isUnsubscribed()) subscriber.onNext(line);
                 });
                 if (!subscriber.isUnsubscribed()) subscriber.onCompleted();
@@ -51,5 +69,19 @@ public final class Utils {
                 if (!subscriber.isUnsubscribed()) subscriber.onError(e);
             }
         });
+    }
+
+    public static <T> Subscription subscribePrint(Observable<T> observable, String name) {
+        return observable.subscribe(
+                (v) -> System.out.println(Thread.currentThread().getName() + "|" + name + " : " + v), (e) -> {
+                    System.err.println("Error from " + name + ":");
+                    System.err.println(e);
+                    System.err.println(Arrays
+                                    .stream(e.getStackTrace())
+                                    .limit(5L)
+                                    .map(stackEl -> "  " + stackEl)
+                                    .collect(Collectors.joining("\n"))
+                    );
+                }, () -> System.out.println(name + " ended!"));
     }
 }
