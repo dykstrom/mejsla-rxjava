@@ -24,7 +24,7 @@ public class TestTriples {
             new Triples.Triple(161, 240, 289)
     );
     
-    private TestSubscriber<Triples.Triple> testSubscriber = new TestSubscriber<>();
+    private final TestSubscriber<Triples.Triple> testSubscriber = new TestSubscriber<>();
 
     @Test
     public void testIsCoPrime() {

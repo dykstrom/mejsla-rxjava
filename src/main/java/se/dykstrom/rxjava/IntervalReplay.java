@@ -17,7 +17,7 @@ import static se.dykstrom.rxjava.Utils.subscribePrint;
  */
 public class IntervalReplay {
 
-    public static void run() throws Exception {
+    private static void run() throws Exception {
         Observable<Long> interval = Observable.interval(100L, TimeUnit.MILLISECONDS);
         Observable<String> mapped = interval.map(l -> "Time=" + LocalTime.now() + ", Free memory=" + getFreeMemory() + " Mb");
         ConnectableObservable<String> published = mapped.replay();
