@@ -7,6 +7,7 @@ import rx.subscriptions.Subscriptions;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -26,7 +27,7 @@ public final class Utils {
 
     /**
      * Runs the given runnable, and returns the time it took for the runnable to complete,
-     * measured in microseconds.
+     * measured in milliseconds.
      */
     public static long timeRun(Runnable runnable) {
         long start = System.currentTimeMillis();
@@ -73,15 +74,14 @@ public final class Utils {
 
     public static <T> Subscription subscribePrint(Observable<T> observable, String name) {
         return observable.subscribe(
-                (v) -> System.out.println(Thread.currentThread().getName() + "|" + name + " : " + v), (e) -> {
-                    System.err.println("Error from " + name + ":");
-                    System.err.println(e);
+                (v) -> System.out.println(LocalTime.now() + "|" + Thread.currentThread().getName() + "|" + name + ": " + v), (e) -> {
+                    System.err.println(LocalTime.now() + "|" + Thread.currentThread().getName() + "|" + name + " error:");
                     System.err.println(Arrays
                                     .stream(e.getStackTrace())
                                     .limit(5L)
                                     .map(stackEl -> "  " + stackEl)
                                     .collect(Collectors.joining("\n"))
                     );
-                }, () -> System.out.println(name + " ended!"));
+                }, () -> System.out.println(LocalTime.now() + "|" + Thread.currentThread().getName() + "|" + name + ": ended!"));
     }
 }
