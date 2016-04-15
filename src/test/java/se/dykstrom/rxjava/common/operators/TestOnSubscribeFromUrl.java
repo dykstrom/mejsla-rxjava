@@ -1,12 +1,12 @@
-package se.dykstrom.rxjava.swing.common.operators;
+package se.dykstrom.rxjava.common.operators;
 
 import org.junit.Before;
 import org.junit.Test;
 import rx.Scheduler;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
-import se.dykstrom.rxjava.Utils;
-import se.dykstrom.rxjava.swing.common.functions.ThrowingFunc2;
+import se.dykstrom.rxjava.common.functions.ThrowingFunc2;
+import se.dykstrom.rxjava.common.operators.OnSubscribeFromUrl;
 
 import java.io.IOException;
 import java.net.URL;
@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static se.dykstrom.rxjava.common.utils.Utils.printRun;
 
 public class TestOnSubscribeFromUrl {
 
@@ -37,7 +38,7 @@ public class TestOnSubscribeFromUrl {
         String document = "some text";
         ThrowingFunc2<URL, Charset, String> fromUrlFunction = (url, charset) -> document;
 
-        test("testOnSubscribeFromUrl", () -> {
+        printRun("testOnSubscribeFromUrl", () -> {
             OnSubscribeFromUrl onSubscribe = new OnSubscribeFromUrl(url, COMPUTATION_SCHEDULER, fromUrlFunction);
 
             onSubscribe.call(subscriber);
@@ -54,7 +55,7 @@ public class TestOnSubscribeFromUrl {
     public void testOnSubscribeFromUrl_IOException() throws Exception {
         ThrowingFunc2<URL, Charset, String> fromUrlFunction = (url, charset) -> { throw new IOException(); };
 
-        test("testOnSubscribeFromUrl_IOException", () -> {
+        printRun("testOnSubscribeFromUrl_IOException", () -> {
             OnSubscribeFromUrl onSubscribe = new OnSubscribeFromUrl(url, COMPUTATION_SCHEDULER, fromUrlFunction);
 
             onSubscribe.call(subscriber);
@@ -64,10 +65,5 @@ public class TestOnSubscribeFromUrl {
             assertTrue(actual.isEmpty());
             subscriber.assertError(IOException.class);
         });
-    }
-
-    private static void test(String name, Runnable runnable) {
-        long time = Utils.timeRun(runnable);
-        System.out.printf("[%s] finished after %d ms\n", name, time);
     }
 }

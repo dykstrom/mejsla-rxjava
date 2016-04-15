@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static se.dykstrom.rxjava.Utils.timeRun;
+import static se.dykstrom.rxjava.common.utils.Utils.timeRun;
 
 public class TestTriples {
 
@@ -20,8 +20,7 @@ public class TestTriples {
             new Triples.Triple(7, 24, 25),
             new Triples.Triple(20, 21, 29),
             new Triples.Triple(12, 35, 37),
-            new Triples.Triple(9, 40, 41),
-            new Triples.Triple(161, 240, 289)
+            new Triples.Triple(9, 40, 41)
     );
     
     private final TestSubscriber<Triples.Triple> testSubscriber = new TestSubscriber<>();
@@ -40,7 +39,7 @@ public class TestTriples {
     @Test
     public void testTriples() {
         long time = timeRun(() -> {
-            Observable<Integer> integers = Observable.range(1, 300);
+            Observable<Integer> integers = Observable.range(1, 100);
             Observable<Triples.Triple> triples = Triples.triples(integers);
             Observable<Triples.Triple> primitive = Triples.primitive(triples);
 

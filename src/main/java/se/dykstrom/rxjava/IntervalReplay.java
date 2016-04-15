@@ -8,7 +8,7 @@ import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import static se.dykstrom.rxjava.Utils.subscribePrint;
+import static se.dykstrom.rxjava.common.utils.Utils.subscribePrint;
 
 /**
  * Tests replay of an interval observable by simulating a stream of memory measurements that can be used

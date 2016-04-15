@@ -4,7 +4,7 @@ import rx.Observable;
 
 import java.util.Objects;
 
-import static se.dykstrom.rxjava.Utils.gcd;
+import static se.dykstrom.rxjava.common.utils.Utils.gcd;
 
 public class Triples {
 

@@ -1,4 +1,4 @@
-package se.dykstrom.rxjava.swing.common.functions;
+package se.dykstrom.rxjava.common.functions;
 
 import rx.functions.Function;
 

@@ -1,10 +1,10 @@
-package se.dykstrom.rxjava.swing.common.operators;
+package se.dykstrom.rxjava.common.operators;
 
 import org.apache.commons.io.IOUtils;
 import rx.Observable.OnSubscribe;
 import rx.Scheduler;
 import rx.Subscriber;
-import se.dykstrom.rxjava.swing.common.functions.ThrowingFunc2;
+import se.dykstrom.rxjava.common.functions.ThrowingFunc2;
 
 import java.net.URL;
 import java.nio.charset.Charset;

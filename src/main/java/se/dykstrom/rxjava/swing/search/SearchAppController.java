@@ -5,7 +5,7 @@ import rx.Scheduler;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.schedulers.SwingScheduler;
-import se.dykstrom.rxjava.swing.common.Observables;
+import se.dykstrom.rxjava.common.Observables;
 
 import java.net.URL;
 import java.util.Collections;
@@ -16,6 +16,7 @@ import static se.dykstrom.rxjava.swing.search.SearchAppUtils.titleObs;
 
 public class SearchAppController {
 
+    public static final int TYPE_DELAY = 500;
     public static final List<String> NO_RESULTS = Collections.<String>emptyList();
     public static final String NO_DOCUMENT = "<html><body></body></html>";
 
@@ -66,7 +67,7 @@ public class SearchAppController {
     public static Observable<List<String>> titlesFromSearchTextObs(Observable<String> searchTextObs, Func1<URL, Observable<String>> observableFactory) {
         return searchTextObs
                 .observeOn(COMPUTATION_SCHEDULER)
-                .debounce(1000, TimeUnit.MILLISECONDS)
+                .debounce(TYPE_DELAY, TimeUnit.MILLISECONDS)
                 .groupBy(String::isEmpty)
                 .flatMap(observable -> observable.getKey() ?
                         observable

@@ -4,6 +4,7 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.schedulers.SwingScheduler;
 import rx.subscriptions.Subscriptions;
+import se.dykstrom.rxjava.swing.common.SwingObservables;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -12,7 +13,7 @@ import javax.swing.event.HyperlinkListener;
 public enum HyperlinkEventSource { ; // no instances
 
     /**
-     * @see se.dykstrom.rxjava.swing.common.Observables#fromHyperlinkEvents(JEditorPane)
+     * @see SwingObservables#fromHyperlinkEvents(JEditorPane)
      */
     public static Observable<HyperlinkEvent> fromHyperlinkEventsOf(JEditorPane editorPane) {
         return Observable.create(new Observable.OnSubscribe<HyperlinkEvent>() {

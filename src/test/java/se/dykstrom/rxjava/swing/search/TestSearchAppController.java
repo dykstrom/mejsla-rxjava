@@ -4,7 +4,6 @@ import org.junit.Test;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.observers.TestSubscriber;
-import se.dykstrom.rxjava.Utils;
 
 import java.io.IOException;
 import java.net.URL;
@@ -15,6 +14,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static se.dykstrom.rxjava.common.utils.Utils.printRun;
 
 public class TestSearchAppController {
 
@@ -35,7 +35,7 @@ public class TestSearchAppController {
         String document = "some text";
         Func1<URL, Observable<String>> observableFactory = url -> Observable.just(document);
 
-        test("testDocumentFromTitle", () -> {
+        printRun("testDocumentFromTitle", () -> {
             Observable<String> source = Observable.zip(
                     Observable.just("foo", "bar"),
                     Observable.interval(100, TimeUnit.MILLISECONDS),
@@ -54,7 +54,7 @@ public class TestSearchAppController {
 
     @Test
     public void testDocumentFromTitle_NoTitle() throws Exception {
-        test("testDocumentFromTitle_NoTitle", () -> {
+        printRun("testDocumentFromTitle_NoTitle", () -> {
             Observable<String> source = Observable.just("");
             Observable<String> observable = SearchAppController.documentFromTitleObs(source);
 
@@ -72,7 +72,7 @@ public class TestSearchAppController {
     public void testDocumentFromTitle_IOException() throws Exception {
         Func1<URL, Observable<String>> observableFactory = url -> Observable.error(new IOException());
 
-        test("testDocumentFromTitle_IOException", () -> {
+        printRun("testDocumentFromTitle_IOException", () -> {
             Observable<String> source = Observable.just("foo");
             Observable<String> observable = SearchAppController.documentFromTitleObs(source, observableFactory);
 
@@ -92,7 +92,7 @@ public class TestSearchAppController {
         Func1<URL, Observable<String>> observableFactory = url -> Observable.just(document0, document1);
 
         URL url = new URL("http://www.google.com");
-        test("testDocumentFromLink", () -> {
+        printRun("testDocumentFromLink", () -> {
             Observable<URL> source = Observable.just(url);
             Observable<String> observable = SearchAppController.documentFromLinkObs(source, observableFactory);
 
@@ -111,7 +111,7 @@ public class TestSearchAppController {
         Func1<URL, Observable<String>> observableFactory = url -> Observable.error(new IOException());
 
         URL url = new URL("http://www.google.com");
-        test("testDocumentFromLink_IOException", () -> {
+        printRun("testDocumentFromLink_IOException", () -> {
             Observable<URL> source = Observable.just(url);
             Observable<String> observable = SearchAppController.documentFromLinkObs(source, observableFactory);
 
@@ -128,13 +128,14 @@ public class TestSearchAppController {
     public void testTitlesFromSearchText() throws Exception {
         Func1<URL, Observable<String>> observableFactory = url -> Observable.just(url.getQuery().contains("foo") ? SOME_RESULTS_JSON : OTHER_RESULTS_JSON);
 
-        test("testTitlesFromSearchText", () -> {
+        printRun("testTitlesFromSearchText", () -> {
+            int delay = SearchAppController.TYPE_DELAY * 120 / 100;
             Observable<String> source0 = Observable.just("f", "foo");
             Observable<String> source1 = Observable.zip(
                     Observable.just("bar"),
-                    Observable.timer(1200, TimeUnit.MILLISECONDS),
+                    Observable.timer(delay, TimeUnit.MILLISECONDS),
                     (x, y) -> x);
-            Observable<String> source2 = Observable.<String>empty().delay(1200, TimeUnit.MILLISECONDS);
+            Observable<String> source2 = Observable.<String>empty().delay(delay, TimeUnit.MILLISECONDS);
 
             // The source will start by emitting "f" and "foo" almost immediately
             // After a delay of 1.2 seconds it will emit "bar"
@@ -143,7 +144,7 @@ public class TestSearchAppController {
             Observable<List<String>> observable = SearchAppController.titlesFromSearchTextObs(source, observableFactory);
 
             observable.subscribe(listSubscriber);
-            listSubscriber.awaitTerminalEvent(3000, TimeUnit.MILLISECONDS);
+            listSubscriber.awaitTerminalEvent(2000, TimeUnit.MILLISECONDS);
 
             List<List<String>> expected = asList(asList("Katt", "Klas Katt"), singletonList("Java"));
             List<List<String>> actual = listSubscriber.getOnNextEvents();
@@ -154,7 +155,7 @@ public class TestSearchAppController {
 
     @Test
     public void testTitlesFromSearchText_NoText() throws Exception {
-        test("testTitlesFromSearchText_NoText", () -> {
+        printRun("testTitlesFromSearchText_NoText", () -> {
             Observable<String> source = Observable.just("");
             Observable<List<String>> observable = SearchAppController.titlesFromSearchTextObs(source);
 
@@ -172,7 +173,7 @@ public class TestSearchAppController {
     public void testTitlesFromSearchText_IOException() throws Exception {
         Func1<URL, Observable<String>> observableFactory = url -> Observable.error(new IOException());
 
-        test("testTitlesFromSearchText_IOException", () -> {
+        printRun("testTitlesFromSearchText_IOException", () -> {
             Observable<String> source = Observable.just("foo");
             Observable<List<String>> observable = SearchAppController.titlesFromSearchTextObs(source, observableFactory);
 
@@ -183,10 +184,5 @@ public class TestSearchAppController {
             assertTrue(actual.isEmpty());
             listSubscriber.assertError(IOException.class);
         });
-    }
-
-    private static void test(String name, Runnable runnable) {
-        long time = Utils.timeRun(runnable);
-        System.out.printf("[%s] finished after %d ms\n", name, time);
     }
 }

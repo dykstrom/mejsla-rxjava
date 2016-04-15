@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import rx.Observable;
 import rx.observers.TestSubscriber;
+import se.dykstrom.rxjava.common.utils.Utils;
 
 import java.util.Arrays;
 import java.util.List;

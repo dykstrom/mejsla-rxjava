@@ -1,16 +1,11 @@
-package se.dykstrom.rxjava;
+package se.dykstrom.rxjava.common.utils;
 
 import rx.Observable;
 import rx.Subscription;
-import rx.subscriptions.Subscriptions;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public final class Utils {
 
@@ -41,6 +36,13 @@ public final class Utils {
     }
 
     /**
+     * Runs the given runnable, and prints to stdout the time it took for the runnable to complete.
+     */
+    public static void printRun(String name, Runnable runnable) {
+        System.out.printf("[%s] finished after %d ms\n", name, timeRun(runnable));
+    }
+
+    /**
      * Returns a string whose value is the given string, with any leading and trailing
      * non-alphabetic characters removed.
      */
@@ -52,24 +54,6 @@ public final class Utils {
         while (!Character.isAlphabetic(string.charAt(end - 1))) end--;
 
         return string.substring(start, end);
-    }
-
-    /**
-     * Returns an {@link Observable} that emits the contents of the given {@link File} line by line.
-     */
-    public static Observable<String> fromFile(File file) {
-        return Observable.create(subscriber -> {
-            try (Stream<String> stream = Files.lines(file.toPath())) {
-                // Make sure the stream is closed when the subscriber unsubscribes
-                subscriber.add(Subscriptions.create(stream::close));
-                stream.forEach(line -> {
-                    if (!subscriber.isUnsubscribed()) subscriber.onNext(line);
-                });
-                if (!subscriber.isUnsubscribed()) subscriber.onCompleted();
-            } catch (IOException e) {
-                if (!subscriber.isUnsubscribed()) subscriber.onError(e);
-            }
-        });
     }
 
     public static <T> Subscription subscribePrint(Observable<T> observable, String name) {

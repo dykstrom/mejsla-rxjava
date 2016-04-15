@@ -2,6 +2,7 @@ package se.dykstrom.rxjava;
 
 import rx.Observable;
 import rx.observables.GroupedObservable;
+import se.dykstrom.rxjava.common.utils.Utils;
 
 import java.util.List;
 import java.util.Objects;

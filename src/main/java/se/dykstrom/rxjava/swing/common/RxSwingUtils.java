@@ -57,7 +57,7 @@ public final class RxSwingUtils {
      * @return An observable that emits link URLs selected in the editor pane.
      */
     public static Observable<URL> selectedLinkObs(JEditorPane editorPane) {
-        return Observables.fromHyperlinkEvents(editorPane)
+        return SwingObservables.fromHyperlinkEvents(editorPane)
                 .filter(event -> event.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
                 .map(HyperlinkEvent::getURL);
     }

@@ -4,16 +4,21 @@ import org.junit.Before;
 import org.junit.Test;
 import rx.Observable;
 import rx.observers.TestSubscriber;
+import rx.schedulers.Schedulers;
+import se.dykstrom.rxjava.common.Observables;
+import se.dykstrom.rxjava.common.utils.Utils;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class TestWords {
 
-    private static final String FILENAME = "test.txt";
+    private static final String FILENAME = "src/test/resources/test.txt";
 
     private TestSubscriber<List<Words.WordCount>> testSubscriber;
 
@@ -55,16 +60,20 @@ public class TestWords {
     }
 
     @Test
-    public void analyzeFile() {
-        Observable<String> strings = Utils.fromFile(new File(FILENAME));
-        Observable<List<Words.WordCount>> wordsByCount = Words.wordsByCount(strings);
+    public void analyzeFile() throws Exception {
+        CountDownLatch latch = new CountDownLatch(1);
+        Observable<String> strings = Observables.fromFile(new File(FILENAME));
+        Observable<List<Words.WordCount>> wordsByCount = Words.wordsByCount(strings)
+                .observeOn(Schedulers.immediate())
+                .finallyDo(latch::countDown);
 
         System.out.printf("Count   Word\n");
         System.out.printf("-----   ---------------------\n");
         wordsByCount.subscribe(
                 list -> list.stream().forEach(wc -> System.out.printf("%5d   %s\n", wc.getValue(), wc.getKey())),
-                error -> System.err.println("Error: " + error.getMessage()),
+                error -> fail("Error: " + error.getMessage()),
                 () -> System.out.printf("-----   ---------------------\n")
         );
+        latch.await();
     }
 }
