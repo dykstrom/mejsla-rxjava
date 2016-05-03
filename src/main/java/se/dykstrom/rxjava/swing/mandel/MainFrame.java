@@ -30,7 +30,7 @@ class MainFrame extends JFrame {
 
     private static Logger TLOG = Logger.getLogger(MainFrame.class.getName());
 
-    private final int workers;
+    private final int sections;
 
     private MandelPanel mandelPanel;
 
@@ -47,10 +47,10 @@ class MainFrame extends JFrame {
     /**
      * Creates new form MainFrame
      *
-     * @param workers Number of workers.
+     * @param sections Number of sections.
      */
-    MainFrame(int workers) {
-        this.workers = workers;
+    MainFrame(int sections) {
+        this.sections = sections;
         this.coordinates = new Coordinates();
         initComponents();
         initSubscriptions();
@@ -168,10 +168,10 @@ class MainFrame extends JFrame {
         // Adjust the coordinates to make the image look right
         coordinates = fixAspectRatio(coordinates, width, height);
 
-        Observable<Line> imageObs = paramObs(workers, width, height, coordinates)
-                .onBackpressureBuffer(100000)
+        Observable<Line> imageObs = paramObs(sections, width, height, coordinates)
                 .flatMap(params -> CalcObservable.fromParams(params, coordinates)
-                        .observeOn(Schedulers.computation()));
+                        .onBackpressureBuffer(100000)
+                        .subscribeOn(Schedulers.computation()));
 
         mandelPanel.clear();
         imageObs.observeOn(SwingScheduler.getInstance()).subscribe(
@@ -186,29 +186,29 @@ class MainFrame extends JFrame {
         undoStack.push(coordinates);
     }
 
-    private static Observable<Params> paramObs(int numThreads, int width, int height, Coordinates coordinates) {
-        final int linesPerThread = height / numThreads;
+    private static Observable<Params> paramObs(int sections, int width, int height, Coordinates coordinates) {
+        final int linesPerSection = height / sections;
         TLOG.info("Total number of lines = " + height);
-        TLOG.info("Number of workers = " + numThreads);
-        TLOG.info("Lines per worker = " + linesPerThread);
+        TLOG.info("Number of sections = " + sections);
+        TLOG.info("Lines per section = " + linesPerSection);
         TLOG.info("Coordinate space = " + coordinates);
 
-        // Divide the coordinate space among the workers
-        final double coordsPerThread = (coordinates.getMaxY() - coordinates.getMinY()) / numThreads;
+        // Divide the coordinate space among the sections
+        final double coordsPerSection = (coordinates.getMaxY() - coordinates.getMinY()) / sections;
 
         List<Params> paramsList = new ArrayList<>();
 
-        // Create one worker for each thread
-        for (int t = 0; t < (numThreads - 1); t++) {
-            double yMin = coordinates.getMinY() + (coordsPerThread * t);
-            double yMax = yMin + coordsPerThread;
-            paramsList.add(new Params(linesPerThread * t, width, linesPerThread, yMin, yMax));
+        // Create parameters for all sections
+        for (int t = 0; t < (sections - 1); t++) {
+            double yMin = coordinates.getMinY() + (coordsPerSection * t);
+            double yMax = yMin + coordsPerSection;
+            paramsList.add(new Params(linesPerSection * t, width, linesPerSection, yMin, yMax));
         }
 
-        // Assign the rest of the lines to the last worker
-        double yMin = coordinates.getMinY() + (coordsPerThread * (numThreads - 1));
-        double yMax = yMin + coordsPerThread;
-        paramsList.add(new Params(linesPerThread * (numThreads - 1), width, height - ((numThreads - 1) * linesPerThread), yMin, yMax));
+        // Assign the rest of the lines to the last section
+        double yMin = coordinates.getMinY() + (coordsPerSection * (sections - 1));
+        double yMax = yMin + coordsPerSection;
+        paramsList.add(new Params(linesPerSection * (sections - 1), width, height - ((sections - 1) * linesPerSection), yMin, yMax));
 
         return Observable.from(paramsList);
     }

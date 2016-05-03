@@ -59,12 +59,12 @@ class CalcObservable {
         @Override
         public void call(Subscriber<? super Line> subscriber) {
             TLOG.info("Creating obs from params " + params + " and coords " + coordinates + " on thread " + Thread.currentThread().getName());
-            final int[] colors = new int[params.getWidth()];
 
             final double dy = (params.getMaxY() - params.getMinY()) / params.getHeight();
             final double dx = (coordinates.getMaxX() - coordinates.getMinX()) / params.getWidth();
 
             for (int y = 0; y < params.getHeight(); y++) {
+                final int[] colors = new int[params.getWidth()];
                 for (int x = 0; x < params.getWidth(); x++) {
                     colors[x] = Params.NUM_ITERATIONS - calc(coordinates.getMinX() + x * dx, params.getMinY() + y * dy);
                 }
