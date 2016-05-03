@@ -12,8 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static se.dykstrom.rxjava.common.utils.Utils.printRun;
 
 public class TestSearchAppController {
@@ -36,18 +34,14 @@ public class TestSearchAppController {
         Func1<URL, Observable<String>> observableFactory = url -> Observable.just(document);
 
         printRun("testDocumentFromTitle", () -> {
-            Observable<String> source = Observable.zip(
-                    Observable.just("foo", "bar"),
-                    Observable.interval(100, TimeUnit.MILLISECONDS),
-                    (x, y) -> x);
+            Observable<String> source = Observable.just("foo", "bar");
             Observable<String> observable = SearchAppController.documentFromTitleObs(source, observableFactory);
 
             observable.subscribe(stringSubscriber);
             stringSubscriber.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS);
 
             List<String> expected = asList(document, document);
-            List<String> actual = stringSubscriber.getOnNextEvents();
-            assertEquals(expected, actual);
+            stringSubscriber.assertReceivedOnNext(expected);
             stringSubscriber.assertCompleted();
         });
     }
@@ -62,8 +56,7 @@ public class TestSearchAppController {
             stringSubscriber.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS);
 
             List<String> expected = singletonList(SearchAppController.NO_DOCUMENT);
-            List<String> actual = stringSubscriber.getOnNextEvents();
-            assertEquals(expected, actual);
+            stringSubscriber.assertReceivedOnNext(expected);
             stringSubscriber.assertCompleted();
         });
     }
@@ -79,8 +72,7 @@ public class TestSearchAppController {
             observable.subscribe(stringSubscriber);
             stringSubscriber.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS);
 
-            List<String> actual = stringSubscriber.getOnNextEvents();
-            assertTrue(actual.isEmpty());
+            stringSubscriber.assertNoValues();
             stringSubscriber.assertError(IOException.class);
         });
     }
@@ -100,8 +92,7 @@ public class TestSearchAppController {
             stringSubscriber.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS);
 
             List<String> expected = asList(document0, document1);
-            List<String> actual = stringSubscriber.getOnNextEvents();
-            assertEquals(expected, actual);
+            stringSubscriber.assertReceivedOnNext(expected);
             stringSubscriber.assertCompleted();
         });
     }
@@ -118,28 +109,24 @@ public class TestSearchAppController {
             observable.subscribe(stringSubscriber);
             stringSubscriber.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS);
 
-            List<String> actual = stringSubscriber.getOnNextEvents();
-            assertTrue(actual.isEmpty());
+            stringSubscriber.assertNoValues();
             stringSubscriber.assertError(IOException.class);
         });
     }
 
     @Test
     public void testTitlesFromSearchText() throws Exception {
-        Func1<URL, Observable<String>> observableFactory = url -> Observable.just(url.getQuery().contains("foo") ? SOME_RESULTS_JSON : OTHER_RESULTS_JSON);
+        Func1<URL, Observable<String>> observableFactory = url -> Observable.just(url.getQuery().contains("Katt") ? SOME_RESULTS_JSON : OTHER_RESULTS_JSON);
 
         printRun("testTitlesFromSearchText", () -> {
             int delay = SearchAppController.TYPE_DELAY * 120 / 100;
-            Observable<String> source0 = Observable.just("f", "foo");
-            Observable<String> source1 = Observable.zip(
-                    Observable.just("bar"),
-                    Observable.timer(delay, TimeUnit.MILLISECONDS),
-                    (x, y) -> x);
+            Observable<String> source0 = Observable.just("K", "Katt");
+            Observable<String> source1 = Observable.just("Java").delay(delay, TimeUnit.MILLISECONDS);
             Observable<String> source2 = Observable.<String>empty().delay(delay, TimeUnit.MILLISECONDS);
 
-            // The source will start by emitting "f" and "foo" almost immediately
-            // After a delay of 1.2 seconds it will emit "bar"
-            // After a second delay of 1.2 seconds, it will complete
+            // The source will start by emitting "K" and "Katt" almost immediately
+            // After a delay of 0.6 seconds it will emit "Java"
+            // After a second delay of 0.6 seconds, it will complete
             Observable<String> source = Observable.concat(source0, source1, source2);
             Observable<List<String>> observable = SearchAppController.titlesFromSearchTextObs(source, observableFactory);
 
@@ -147,8 +134,7 @@ public class TestSearchAppController {
             listSubscriber.awaitTerminalEvent(2000, TimeUnit.MILLISECONDS);
 
             List<List<String>> expected = asList(asList("Katt", "Klas Katt"), singletonList("Java"));
-            List<List<String>> actual = listSubscriber.getOnNextEvents();
-            assertEquals(expected, actual);
+            listSubscriber.assertReceivedOnNext(expected);
             listSubscriber.assertCompleted();
         });
     }
@@ -163,8 +149,7 @@ public class TestSearchAppController {
             listSubscriber.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS);
 
             List<List<String>> expected = singletonList(SearchAppController.NO_RESULTS);
-            List<List<String>> actual = listSubscriber.getOnNextEvents();
-            assertEquals(expected, actual);
+            listSubscriber.assertReceivedOnNext(expected);
             listSubscriber.assertCompleted();
         });
     }
@@ -180,8 +165,7 @@ public class TestSearchAppController {
             observable.subscribe(listSubscriber);
             listSubscriber.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS);
 
-            List<List<String>> actual = listSubscriber.getOnNextEvents();
-            assertTrue(actual.isEmpty());
+            listSubscriber.assertNoValues();
             listSubscriber.assertError(IOException.class);
         });
     }

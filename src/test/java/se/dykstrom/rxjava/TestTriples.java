@@ -50,6 +50,7 @@ public class TestTriples {
 
             assertTrue(onNextEvents.containsAll(TRIPLES));
 
+            testSubscriber.assertNoErrors();
             testSubscriber.assertCompleted();
         });
         System.out.printf("[%s] finished after %d ms\n", "testTriples", time);

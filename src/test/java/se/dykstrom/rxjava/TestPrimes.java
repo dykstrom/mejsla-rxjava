@@ -50,6 +50,7 @@ public class TestPrimes {
             System.out.printf("[%s] found %d primes: %s\n", name, actualPrimes.size(), actualPrimes);
 
             assertActualPrimes(actualPrimes);
+            testSubscriber.assertNoErrors();
             testSubscriber.assertCompleted();
         });
         System.out.printf("[%s] finished after %d ms\n", name, time);

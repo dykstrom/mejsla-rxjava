@@ -11,9 +11,7 @@ import java.net.URL;
 
 public final class Observables {
 
-    private Observables() {
-        // Hidden
-    }
+    private Observables() { }
 
     /**
      * Returns an Observable that reads a document from the given URL, emits it as a single string,

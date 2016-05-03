@@ -6,6 +6,7 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.schedulers.SwingScheduler;
 import se.dykstrom.rxjava.common.Observables;
+import se.dykstrom.rxjava.common.operators.ToUrl;
 
 import java.net.URL;
 import java.util.Collections;
@@ -74,7 +75,7 @@ public class SearchAppController {
                                 .map(ignore -> NO_RESULTS) :
                         observable
                                 .map(SearchAppUtils::toSearchQuery)
-                                .map(SearchAppUtils::toUrl)
+                                .lift(new ToUrl())
                                 .switchMap(url -> observableFactory.call(url)
                                         .observeOn(COMPUTATION_SCHEDULER)
                                         .flatMap(document -> titleObs(document).toSortedList())));
@@ -109,7 +110,7 @@ public class SearchAppController {
                                 .map(ignore -> NO_DOCUMENT) :
                         observable
                                 .map(SearchAppUtils::toArticleQuery)
-                                .map(SearchAppUtils::toUrl)
+                                .lift(new ToUrl())
                                 .switchMap(url -> observableFactory.call(url)
                                         .map(SearchAppUtils::fixWikipediaLinks)));
     }

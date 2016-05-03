@@ -54,6 +54,7 @@ public class TestWords {
             List<Words.WordCount> actual = onNextEvents.get(0);
             assertEquals(expected, actual);
 
+            testSubscriber.assertNoErrors();
             testSubscriber.assertCompleted();
         });
         System.out.printf("[%s] finished after %d ms\n", "testWordsByCount", time);

@@ -5,7 +5,6 @@ import org.junit.Test;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -55,16 +54,6 @@ public class TestSearchAppUtils {
         Collection<String> actual = subscribeToTitleObs(titleSubscriber, INVALID_RESULTS_JSON);
         assertTrue(actual.isEmpty());
         titleSubscriber.assertError(JsonSyntaxException.class);
-    }
-
-    @Test
-    public void testNewUrl() throws Exception {
-        assertEquals(new URL("http://www.google.com"), SearchAppUtils.toUrl("http://www.google.com"));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testNewUrl_MalformedUrl() throws Exception {
-        SearchAppUtils.toUrl("foo");
     }
 
     private static Collection<String> subscribeToTitleObs(TestSubscriber<String> subscriber, String json) {

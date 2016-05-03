@@ -6,8 +6,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import rx.Observable;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.LocalTime;
 
 public final class SearchAppUtils {
@@ -18,9 +16,7 @@ public final class SearchAppUtils {
 
     private static final String ARTICLE_URL = WIKIPEDIA_URL + "/wiki/{title}";
 
-    private SearchAppUtils() {
-        // Hidden
-    }
+    private SearchAppUtils() { }
 
     public static String toSearchQuery(String text) {
         return SEARCH_URL.replace("{text}",  text);
@@ -50,17 +46,6 @@ public final class SearchAppUtils {
                 if (!subscriber.isUnsubscribed()) subscriber.onError(e);
             }
         });
-    }
-
-    /**
-     * Creates a URL from the given URL spec.
-     */
-    public static URL toUrl(String spec) {
-        try {
-            return new URL(spec);
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException(e.getMessage(), e);
-        }
     }
 
     /**

@@ -6,18 +6,12 @@ import rx.Scheduler;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 import se.dykstrom.rxjava.common.functions.ThrowingFunc2;
-import se.dykstrom.rxjava.common.operators.OnSubscribeFromUrl;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static se.dykstrom.rxjava.common.utils.Utils.printRun;
 
 public class TestOnSubscribeFromUrl {
@@ -34,7 +28,7 @@ public class TestOnSubscribeFromUrl {
     }
 
     @Test
-    public void testFromUrl() throws Exception {
+    public void testOnSubscribeFromUrl() throws Exception {
         String document = "some text";
         ThrowingFunc2<URL, Charset, String> fromUrlFunction = (url, charset) -> document;
 
@@ -44,9 +38,8 @@ public class TestOnSubscribeFromUrl {
             onSubscribe.call(subscriber);
             subscriber.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS);
 
-            Collection<String> expected = Collections.singletonList(document);
-            Collection<String> actual = subscriber.getOnNextEvents();
-            assertEquals(new HashSet<>(expected), new HashSet<>(actual));
+            subscriber.assertValues(document);
+            subscriber.assertNoErrors();
             subscriber.assertCompleted();
         });
     }
@@ -61,8 +54,7 @@ public class TestOnSubscribeFromUrl {
             onSubscribe.call(subscriber);
             subscriber.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS);
 
-            Collection<String> actual = subscriber.getOnNextEvents();
-            assertTrue(actual.isEmpty());
+            subscriber.assertNoValues();
             subscriber.assertError(IOException.class);
         });
     }
