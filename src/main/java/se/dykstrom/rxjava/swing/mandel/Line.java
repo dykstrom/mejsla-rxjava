@@ -1,21 +1,30 @@
 package se.dykstrom.rxjava.swing.mandel;
 
+/**
+ * Contains RGB color data for a single line in an image.
+ */
 class Line {
 
     private final int y;
 
-    private final int[] escapeTimes;
+    private final int[] rgb;
 
-    Line(int y, int[] escapeTimes) {
+    Line(int y, int[] rgb) {
         this.y = y;
-        this.escapeTimes = escapeTimes;
+        this.rgb = rgb;
     }
 
+    /**
+     * Returns the line number.
+     */
     int getY() {
         return y;
     }
 
-    int[] getEscapeTimes() {
-        return escapeTimes;
+    /**
+     * Returns an array of RGB color data for this line.
+     */
+    int[] getRGB() {
+        return rgb;
     }
 }
