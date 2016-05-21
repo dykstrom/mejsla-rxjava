@@ -2,14 +2,21 @@ package se.dykstrom.rxjava.swing.mandel;
 
 import rx.Producer;
 import rx.Subscriber;
+import rx.internal.operators.BackpressureUtils;
 
 import java.awt.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 /**
  * A {@link Producer} class that produces the lines to be emitted by the LineObservable.
  * This class supports backpressure.
+ *
+ * Is this the easiest or most efficient way to produce and emit the lines that make up
+ * an image segment? Definitely not. Much easier would be to create all lines upfront,
+ * store them in an array, and use one of the Observable factory methods. But the point
+ * of this exercise was to try out backpressure support...
  *
  * @author Johan Dykstrom
  */
@@ -19,14 +26,10 @@ class LineProducer implements Producer {
 
     private static final int NUM_ITERATIONS = 100;
 
-    /**
-     * The RGB colors to use when drawing the image.
-     */
+    /** The RGB colors to use when drawing the image. */
     private static final int[] COLORS = new int[256 * 2];
 
-    /**
-     * The factor used to convert the "escape time" value to an RGB color.
-     */
+    /** The factor used to convert the "escape time" value to an RGB color. */
     private static final double FACTOR = (double) (COLORS.length - 1) / NUM_ITERATIONS;
 
     static {
@@ -47,8 +50,10 @@ class LineProducer implements Producer {
     private final double dx;
     private final double dy;
 
-    private final AtomicInteger totalY = new AtomicInteger(0);
-    private final AtomicInteger requests = new AtomicInteger(0);
+    /** The number of requested lines. */
+    private final AtomicLong requested = new AtomicLong(0);
+    /** The Y value (line number) to use in next request. */
+    private final AtomicInteger nextY = new AtomicInteger(0);
 
     public LineProducer(Parameters parameters, Subscriber<? super Line> subscriber) {
         TLOG.finest("Creating producer from parameters " + parameters + " on thread " + Thread.currentThread().getName());
@@ -69,58 +74,61 @@ class LineProducer implements Producer {
     public void request(long n) {
         if (n < 0) {
             throw new IllegalArgumentException();
-        } else if (n == Long.MAX_VALUE) {
+        } else if (n == Long.MAX_VALUE && requested.compareAndSet(0, Long.MAX_VALUE)) {
             // MAX_VALUE means that no backpressure is needed
-            produceLines(parameters.getHeight(), getStartLine(parameters.getHeight()));
-            subscriber.onCompleted();
-        } else {
-            try {
-                // Requests can be nested, so we must keep track of how many requests are active
-                addRequest();
-                produceLines(n, getStartLine((int) n));
-            } finally {
-                removeRequest();
-                // If this is the last request ending, and all lines have been produced,
-                // we can safely invoke onCompleted
-                if (isLastRequest() && areAllLinesProduced()) {
-                    subscriber.onCompleted();
-                }
+            fastPath();
+        } else if (requested.get() != Long.MAX_VALUE) {
+            if (BackpressureUtils.getAndAddRequest(requested, n) == 0L) {
+                // Backpressure is requested
+                slowPath(n);
             }
         }
     }
 
-    private void addRequest() {
-        requests.incrementAndGet();
+    private void fastPath() {
+        for (int y = 0; y < parameters.getHeight(); y++) {
+            if (!subscriber.isUnsubscribed()) produceLine(y);
+        }
+        if (!subscriber.isUnsubscribed()) subscriber.onCompleted();
     }
 
-    private void removeRequest() {
-        requests.decrementAndGet();
-    }
+    private void slowPath(long r) {
+        int height = parameters.getHeight();
+        while (true) {
+            // Get y to start with this time, and increase with number of requested for next time
+            int y = nextY.getAndAdd((int) r);
 
-    private boolean isLastRequest() {
-        return requests.get() == 0;
-    }
+            boolean complete = y < height && nextY.get() >= height;
 
-    private int getStartLine(int n) {
-        return totalY.getAndAdd(n);
-    }
+            for (int count = 0; count < r && y < height; count++, y++) {
+                produceLine(y);
+            }
 
-    private boolean areAllLinesProduced() {
-        return totalY.get() >= parameters.getHeight();
+            if (complete) {
+                if (!subscriber.isUnsubscribed()) subscriber.onCompleted();
+            }
+
+            // Now we have produced the number of requested lines, so reduce 'requested' with that
+            // At the same time get any new number of requested lines for the next iteration
+            r = requested.addAndGet(-r);
+            if (r <= 0) {
+                return;
+            }
+        }
     }
 
     /**
-     * Produces {@code n} more lines, starting from line {@code y}.
+     * Produces a single line, and emits it to the subscriber.
+     *
+     * @param y The line number of the line to produce.
      */
-    private void produceLines(long n, int y) {
-        for (int count = 0; count < n && y < parameters.getHeight(); count++, y++) {
-            final int[] rgb = new int[parameters.getWidth()];
-            for (int x = 0; x < rgb.length; x++) {
-                int escapeTime = NUM_ITERATIONS - calc(minX + x * dx, minY + y * dy);
-                rgb[x] = COLORS[(int) (escapeTime * FACTOR)];
-            }
-            subscriber.onNext(new Line(y + parameters.getStartY(), rgb));
+    private void produceLine(int y) {
+        final int[] rgb = new int[parameters.getWidth()];
+        for (int x = 0; x < rgb.length; x++) {
+            int escapeTime = NUM_ITERATIONS - calc(minX + x * dx, minY + y * dy);
+            rgb[x] = COLORS[(int) (escapeTime * FACTOR)];
         }
+        if (!subscriber.isUnsubscribed()) subscriber.onNext(new Line(y + parameters.getStartY(), rgb));
     }
 
     /**

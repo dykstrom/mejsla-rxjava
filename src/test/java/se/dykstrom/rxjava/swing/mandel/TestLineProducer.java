@@ -77,6 +77,17 @@ public class TestLineProducer {
     }
 
     @Test
+    public void testRequestMaxValue() {
+        printRun("testRequestMaxValue", () -> {
+            height10Producer.request(Long.MAX_VALUE);
+
+            assertEquals(10, height10Subscriber.getOnNextEvents().size());
+            height10Subscriber.assertCompleted();
+            height10Subscriber.assertNoErrors();
+        });
+    }
+
+    @Test
     public void testRequestTwoChunks() {
         printRun("testRequestTwoChunks", () -> {
             height10Producer.request(5);

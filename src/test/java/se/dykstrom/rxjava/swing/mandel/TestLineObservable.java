@@ -5,6 +5,8 @@ import rx.Observable;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 
+import java.util.Iterator;
+
 import static org.junit.Assert.assertEquals;
 import static se.dykstrom.rxjava.common.utils.Utils.printRun;
 
@@ -39,6 +41,28 @@ public class TestLineObservable {
             merged.subscribe(testSubscriber);
 
             assertEquals(300, testSubscriber.getOnNextEvents().size());
+            testSubscriber.assertCompleted();
+            testSubscriber.assertNoErrors();
+        });
+    }
+
+    @Test
+    public void testSubscribeWithTake() {
+        printRun("testSubscribeWithTake", () -> {
+            Observable<Line> observable = LineObservable.fromParameters(PARAMS_WITH_HEIGHT_100);
+
+            Observable<Line> taken = observable.take(5);
+
+            taken.subscribe(testSubscriber);
+
+            assertEquals(5, testSubscriber.getOnNextEvents().size());
+            Iterator<Line> iterator = testSubscriber.getOnNextEvents().iterator();
+            assertEquals(0, iterator.next().getY());
+            assertEquals(1, iterator.next().getY());
+            assertEquals(2, iterator.next().getY());
+            assertEquals(3, iterator.next().getY());
+            assertEquals(4, iterator.next().getY());
+
             testSubscriber.assertCompleted();
             testSubscriber.assertNoErrors();
         });
