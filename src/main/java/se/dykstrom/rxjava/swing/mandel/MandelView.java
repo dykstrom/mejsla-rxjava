@@ -86,9 +86,8 @@ class MandelView extends JFrame {
     }
 
     private void showError(Throwable throwable) {
-        SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(this, "Failed to calculate image:\n" + throwable.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        });
+        SwingUtilities.invokeLater(() ->
+                JOptionPane.showMessageDialog(this, "Failed to calculate image:\n" + throwable.getMessage(), "Error", JOptionPane.ERROR_MESSAGE));
     }
 
     private void initComponents() {
@@ -98,7 +97,6 @@ class MandelView extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("Mandel");
         setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(500, 500));
 
         add(mandelPanel, BorderLayout.CENTER);
 

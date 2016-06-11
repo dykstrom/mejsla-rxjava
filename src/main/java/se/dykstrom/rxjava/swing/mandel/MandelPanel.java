@@ -12,8 +12,15 @@ import java.awt.image.BufferedImage;
  */
 class MandelPanel extends JComponent {
 
+    /** The initial width and height of the image in pixels. */
+    public static final int INITIAL_IMAGE_SIZE = 500;
+
     /** The off-screen image buffer. */
     private BufferedImage image;
+
+    public MandelPanel() {
+        setPreferredSize(new Dimension(INITIAL_IMAGE_SIZE, INITIAL_IMAGE_SIZE));
+    }
 
     @Override
     public void paintComponent(Graphics graphics) {

@@ -15,8 +15,8 @@ import static se.dykstrom.rxjava.common.utils.Utils.printRun;
 
 public class TestLineProducer {
 
-    private static final Parameters PARAMS_WITH_HEIGHT_10 = new Parameters(0, 100, 10, Coordinates.START);
-    private static final Parameters PARAMS_WITH_HEIGHT_1000 = new Parameters(0, 100, 1000, Coordinates.START);
+    private static final Parameters PARAMS_WITH_HEIGHT_10 = new Parameters(0, 100, 10, ImageAttributes.INITIAL_ATTRIBUTES);
+    private static final Parameters PARAMS_WITH_HEIGHT_1000 = new Parameters(0, 100, 1000, ImageAttributes.INITIAL_ATTRIBUTES);
 
     private TestSubscriber<Line> height10Subscriber;
     private TestSubscriber<Line> height1000Subscriber;

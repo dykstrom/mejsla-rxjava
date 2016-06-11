@@ -45,29 +45,15 @@ class LineProducer implements Producer {
     private final Parameters parameters;
     private final Subscriber<? super Line> subscriber;
 
-    private final double minX;
-    private final double minY;
-    private final double dx;
-    private final double dy;
-
     /** The number of requested lines. */
     private final AtomicLong requested = new AtomicLong(0);
     /** The Y value (line number) to use in next request. */
     private final AtomicInteger nextY = new AtomicInteger(0);
 
     public LineProducer(Parameters parameters, Subscriber<? super Line> subscriber) {
-        TLOG.finest("Creating producer from parameters " + parameters + " on thread " + Thread.currentThread().getName());
-
+        TLOG.info("Creating producer from parameters " + parameters + " on thread " + Thread.currentThread().getName());
         this.parameters = parameters;
         this.subscriber = subscriber;
-
-        minX = parameters.getCoordinates().getMinX();
-        minY = parameters.getCoordinates().getMinY();
-        double maxX = parameters.getCoordinates().getMaxX();
-        double maxY = parameters.getCoordinates().getMaxY();
-
-        dx = (maxX - minX) / parameters.getWidth();
-        dy = (maxY - minY) / parameters.getHeight();
     }
 
     @Override
@@ -123,12 +109,15 @@ class LineProducer implements Producer {
      * @param y The line number of the line to produce.
      */
     private void produceLine(int y) {
+        Coordinates coordinates = parameters.getImageAttributes().getCoordinates();
+        double scale = parameters.getImageAttributes().getScale();
+
         final int[] rgb = new int[parameters.getWidth()];
         for (int x = 0; x < rgb.length; x++) {
-            int escapeTime = NUM_ITERATIONS - calc(minX + x * dx, minY + y * dy);
+            int escapeTime = NUM_ITERATIONS - calc(coordinates.getMinX() + x * scale, coordinates.getMinY() + y * scale);
             rgb[x] = COLORS[(int) (escapeTime * FACTOR)];
         }
-        if (!subscriber.isUnsubscribed()) subscriber.onNext(new Line(y + parameters.getStartY(), rgb));
+        if (!subscriber.isUnsubscribed()) subscriber.onNext(new Line(y + parameters.getFirstY(), rgb));
     }
 
     /**

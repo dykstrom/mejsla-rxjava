@@ -12,9 +12,9 @@ import static se.dykstrom.rxjava.common.utils.Utils.printRun;
 
 public class TestLineObservable {
 
-    private static final Parameters PARAMS_WITH_HEIGHT_100 = new Parameters(0, 100, 100, Coordinates.START);
+    private static final Parameters PARAMS_WITH_HEIGHT_100 = new Parameters(0, 100, 100, ImageAttributes.INITIAL_ATTRIBUTES);
 
-    private TestSubscriber<Line> testSubscriber = new TestSubscriber<>();
+    private final TestSubscriber<Line> testSubscriber = new TestSubscriber<>();
 
     @Test
     public void testSubscribe() {
