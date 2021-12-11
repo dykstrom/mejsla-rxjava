@@ -1,13 +1,13 @@
 package se.dykstrom.rxjava.swing.mandel;
 
-import rx.Producer;
-import rx.Subscriber;
-import rx.internal.operators.BackpressureUtils;
-
-import java.awt.*;
+import java.awt.Color;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
+
+import rx.Producer;
+import rx.Subscriber;
+import rx.internal.operators.BackpressureUtils;
 
 /**
  * A {@link Producer} class that produces the lines to be emitted by the LineObservable.
@@ -109,12 +109,12 @@ class LineProducer implements Producer {
      * @param y The line number of the line to produce.
      */
     private void produceLine(int y) {
-        Coordinates coordinates = parameters.getImageAttributes().getCoordinates();
-        double scale = parameters.getImageAttributes().getScale();
+        Coordinates coordinates = parameters.getImageAttributes().coordinates();
+        double scale = parameters.getImageAttributes().scale();
 
         final int[] rgb = new int[parameters.getWidth()];
         for (int x = 0; x < rgb.length; x++) {
-            int escapeTime = NUM_ITERATIONS - calc(coordinates.getMinX() + x * scale, coordinates.getMinY() + y * scale);
+            int escapeTime = NUM_ITERATIONS - calc(coordinates.minX() + x * scale, coordinates.minY() + y * scale);
             rgb[x] = COLORS[(int) (escapeTime * FACTOR)];
         }
         if (!subscriber.isUnsubscribed()) subscriber.onNext(new Line(y + parameters.getFirstY(), rgb));

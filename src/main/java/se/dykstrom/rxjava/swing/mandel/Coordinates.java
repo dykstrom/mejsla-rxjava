@@ -6,27 +6,11 @@ package se.dykstrom.rxjava.swing.mandel;
  *
  * @author Johan Dykstrom
  */
-class Coordinates {
+record Coordinates(double minX, double minY) {
 
     static final Coordinates INITIAL_COORDINATES = new Coordinates(-2.0, -1.5);
 
     static final double INITIAL_SIZE = 3.0;
-
-    private final double minX;
-    private final double minY;
-
-    Coordinates(double minX, double minY) {
-        this.minX = minX;
-        this.minY = minY;
-    }
-
-    double getMinX() {
-        return minX;
-    }
-
-    double getMinY() {
-        return minY;
-    }
 
     Coordinates withMinY(double minY) {
         return new Coordinates(minX, minY);

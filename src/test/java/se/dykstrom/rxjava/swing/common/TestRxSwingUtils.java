@@ -1,10 +1,9 @@
 package se.dykstrom.rxjava.swing.common;
 
-import org.junit.Test;
-import rx.Observable;
-import rx.observers.TestSubscriber;
-
-import javax.swing.*;
+import javax.swing.JEditorPane;
+import javax.swing.JList;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import java.awt.event.KeyEvent;
@@ -14,13 +13,18 @@ import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
+import rx.Observable;
+import rx.observers.TestSubscriber;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static se.dykstrom.rxjava.common.utils.Utils.printRun;
 
 public class TestRxSwingUtils {
 
     @Test
-    public void testTypedTextObs() throws Exception {
+    public void testTypedTextObs() {
         printRun("testTypedTextObs", () -> {
             MockedTextField textField = new MockedTextField();
             Observable<String> textObs = RxSwingUtils.typedTextObs(textField);
@@ -52,7 +56,7 @@ public class TestRxSwingUtils {
     }
 
     @Test
-    public void testSelectedItemObs() throws Exception {
+    public void testSelectedItemObs() {
         printRun("testSelectedItemObs", () -> {
             JList<String> list = new JList<>(new String[]{"a", "b", "c"});
             Observable<String> itemObs = RxSwingUtils.selectedItemObs(list);
@@ -113,9 +117,9 @@ public class TestRxSwingUtils {
 
     private static void await(CountDownLatch latch, int timeout, TimeUnit unit) {
         try {
-            latch.await(timeout, unit);
+            assertTrue(latch.await(timeout, unit));
         } catch (InterruptedException e) {
-            throw new RuntimeException("Interrupted", e);
+            Thread.currentThread().interrupt();
         }
     }
 

@@ -11,7 +11,7 @@ public class TestPairMap {
 
     private static final PairMap<Integer, String> COLON_MAPPER = new PairMap<>((a, b) -> a + ":" + b);
 
-    private static final PairMap<Integer, Integer> ADD_MAPPER = new PairMap<>((a, b) -> a + b);
+    private static final PairMap<Integer, Integer> ADD_MAPPER = new PairMap<>(Integer::sum);
 
     private final TestSubscriber<String> subscriber = new TestSubscriber<>();
 

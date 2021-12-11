@@ -1,11 +1,11 @@
 package se.dykstrom.rxjava;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Test;
 import rx.Observable;
 import rx.observers.TestSubscriber;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -46,7 +46,7 @@ public class TestTriples {
             primitive.subscribe(testSubscriber);
 
             List<Triples.Triple> onNextEvents = testSubscriber.getOnNextEvents();
-            onNextEvents.stream().forEach(System.out::println);
+            onNextEvents.forEach(System.out::println);
 
             assertTrue(onNextEvents.containsAll(TRIPLES));
 

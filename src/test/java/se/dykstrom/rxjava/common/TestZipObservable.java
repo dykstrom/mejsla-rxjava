@@ -1,11 +1,7 @@
 package se.dykstrom.rxjava.common;
 
-import org.junit.Test;
-import rx.Observable;
-import rx.observers.TestSubscriber;
-
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -13,6 +9,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
+
+import org.junit.Test;
+import rx.Observable;
+import rx.observers.TestSubscriber;
 
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
@@ -56,7 +56,7 @@ public class TestZipObservable {
     }
 
     @Test
-    public void testFromPath_IOException() throws Exception {
+    public void testFromPath_IOException() {
         Path path = Paths.get("c:/Temp/does-not-exist.zip");
 
         printRun("testFromPath_IOException", () -> {
@@ -66,7 +66,7 @@ public class TestZipObservable {
             subscriber.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS);
 
             subscriber.assertNoValues();
-            subscriber.assertError(FileNotFoundException.class);
+            subscriber.assertError(NoSuchFileException.class);
         });
     }
 }

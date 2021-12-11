@@ -1,9 +1,9 @@
 package se.dykstrom.rxjava;
 
+import java.util.function.BiFunction;
+
 import rx.Observable.Operator;
 import rx.Subscriber;
-
-import java.util.function.BiFunction;
 
 /**
  * An {@link Operator} that implements a
@@ -25,7 +25,7 @@ public class PairMap<T, R> implements Operator<R, T> {
 
     @Override
     public Subscriber<? super T> call(Subscriber<? super R> subscriber) {
-        return new Subscriber<T>(subscriber) {
+        return new Subscriber<>(subscriber) {
 
             private T previous;
 

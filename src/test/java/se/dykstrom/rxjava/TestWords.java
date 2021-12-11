@@ -1,5 +1,10 @@
 package se.dykstrom.rxjava;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
 import org.junit.Before;
 import org.junit.Test;
 import rx.Observable;
@@ -7,11 +12,6 @@ import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 import se.dykstrom.rxjava.common.Observables;
 import se.dykstrom.rxjava.common.utils.Utils;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -68,12 +68,12 @@ public class TestWords {
                 .observeOn(Schedulers.immediate())
                 .finallyDo(latch::countDown);
 
-        System.out.printf("Count   Word\n");
-        System.out.printf("-----   ---------------------\n");
+        System.out.println("Count   Word");
+        System.out.println("-----   ---------------------");
         wordsByCount.subscribe(
-                list -> list.stream().forEach(wc -> System.out.printf("%5d   %s\n", wc.getValue(), wc.getKey())),
+                list -> list.forEach(wc -> System.out.printf("%5d   %s\n", wc.getValue(), wc.getKey())),
                 error -> fail("Error: " + error.getMessage()),
-                () -> System.out.printf("-----   ---------------------\n")
+                () -> System.out.println("-----   ---------------------")
         );
         latch.await();
     }

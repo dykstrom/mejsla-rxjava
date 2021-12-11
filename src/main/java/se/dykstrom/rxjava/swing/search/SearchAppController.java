@@ -1,5 +1,10 @@
 package se.dykstrom.rxjava.swing.search;
 
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Func1;
@@ -8,17 +13,12 @@ import rx.schedulers.SwingScheduler;
 import se.dykstrom.rxjava.common.Observables;
 import se.dykstrom.rxjava.common.operators.ToUrl;
 
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import static se.dykstrom.rxjava.swing.search.SearchAppUtils.titleObs;
 
 public class SearchAppController {
 
     public static final int TYPE_DELAY = 500;
-    public static final List<String> NO_RESULTS = Collections.<String>emptyList();
+    public static final List<String> NO_RESULTS = Collections.emptyList();
     public static final String NO_DOCUMENT = "<html><body></body></html>";
 
     private static final Scheduler COMPUTATION_SCHEDULER = Schedulers.computation();
@@ -62,7 +62,7 @@ public class SearchAppController {
      * Observable that loads a document from a URL.
      *
      * @param searchTextObs The source Observable, emitting search texts entered by the user.
-     * @param observableFactory A factory used to create an Observable that can load a document from an URL.
+     * @param observableFactory A factory used to create an Observable that can load a document from a URL.
      * @return An Observable that results from searching Wikipedia.
      */
     public static Observable<List<String>> titlesFromSearchTextObs(Observable<String> searchTextObs, Func1<URL, Observable<String>> observableFactory) {
@@ -98,7 +98,7 @@ public class SearchAppController {
      * Observable that loads a document from a URL.
      *
      * @param titleObs The source Observable, emitting article titles selected by the user.
-     * @param observableFactory A factory used to create an Observable that can load a document from an URL.
+     * @param observableFactory A factory used to create an Observable that can load a document from a URL.
      * @return An Observable that emits documents (articles) from Wikipedia.
      */
     public static Observable<String> documentFromTitleObs(Observable<String> titleObs, Func1<URL, Observable<String>> observableFactory) {

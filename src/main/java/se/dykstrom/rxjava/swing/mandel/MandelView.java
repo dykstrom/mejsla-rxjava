@@ -1,16 +1,24 @@
 package se.dykstrom.rxjava.swing.mandel;
 
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+
 import rx.Observable;
 import rx.observables.SwingObservable;
 import rx.schedulers.SwingScheduler;
 import se.dykstrom.rxjava.swing.common.SwingObservables;
 import se.dykstrom.rxjava.swing.components.RubberBandSelectionEvent;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 
 /**
  * Creates the main view and all its components.
@@ -110,7 +118,7 @@ class MandelView extends JFrame {
         fileMenu.setMnemonic('F');
 
         newMenuItem = new JMenuItem();
-        newMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
+        newMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
         newMenuItem.setText("New");
         fileMenu.add(newMenuItem);
 
@@ -123,7 +131,7 @@ class MandelView extends JFrame {
         editMenu.setMnemonic('E');
 
         undoMenuItem = new JMenuItem();
-        undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
+        undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
         undoMenuItem.setText("Undo");
         editMenu.add(undoMenuItem);
 

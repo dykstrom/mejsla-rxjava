@@ -31,7 +31,7 @@ public class RubberBandSelector {
     public RubberBandSelector(Component component) {
         this.component = component;
 
-        // Add mouse event listeners to the component component, so we can track mouse movement
+        // Add mouse event listeners to the component, so we can track mouse movement
         MouseRecorder recorder = new MouseRecorder();
         component.addMouseListener(recorder);
         component.addMouseMotionListener(recorder);
@@ -47,7 +47,7 @@ public class RubberBandSelector {
     }
 
     /**
-     * Removes the given listener so it will no longer receive any events from this component.
+     * Removes the given listener, so it will no longer receive any events from this component.
      */
     public void removeRubberBandListener(RubberBandSelectionListener listener) {
         synchronized (listeners) {

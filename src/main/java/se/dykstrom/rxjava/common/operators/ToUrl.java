@@ -1,10 +1,10 @@
 package se.dykstrom.rxjava.common.operators;
 
-import rx.Observable.Operator;
-import rx.Subscriber;
-
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import rx.Observable.Operator;
+import rx.Subscriber;
 
 /**
  * An {@link Operator} that implements a mapping from String to URL.
@@ -12,7 +12,7 @@ import java.net.URL;
 public class ToUrl implements Operator<URL, String> {
     @Override
     public Subscriber<? super String> call(Subscriber<? super URL> subscriber) {
-        return new Subscriber<String>(subscriber) {
+        return new Subscriber<>(subscriber) {
             @Override
             public void onCompleted() {
                 subscriber.onCompleted();

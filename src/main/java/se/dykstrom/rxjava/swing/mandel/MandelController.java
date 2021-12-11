@@ -1,15 +1,16 @@
 package se.dykstrom.rxjava.swing.mandel;
 
-import rx.Observable;
-import rx.schedulers.Schedulers;
-import se.dykstrom.rxjava.swing.components.RubberBandSelectionEvent;
-
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+
+import rx.Observable;
+import rx.schedulers.Schedulers;
+import se.dykstrom.rxjava.swing.components.RubberBandSelectionEvent;
 
 class MandelController {
 
@@ -59,7 +60,7 @@ class MandelController {
             bounds = new Rectangle(0, 0, (int) size.getWidth(), (int) size.getWidth());
         }
         Coordinates coordinates = centerImage(size, bounds, scale,
-                Coordinates.INITIAL_COORDINATES.getMinX(), Coordinates.INITIAL_COORDINATES.getMinY());
+                Coordinates.INITIAL_COORDINATES.minX(), Coordinates.INITIAL_COORDINATES.minY());
         undoStack.push(createImage(new ImageAttributes(coordinates, scale)));
     }
 
@@ -86,11 +87,11 @@ class MandelController {
         TLOG.finest("Selected area = " + bounds);
 
         ImageAttributes imageAttributes = undoStack.peek();
-        Coordinates coordinates = imageAttributes.getCoordinates();
-        final double scale = imageAttributes.getScale();
+        Coordinates coordinates = imageAttributes.coordinates();
+        final double scale = imageAttributes.scale();
 
-        final double newMinX = coordinates.getMinX() + bounds.getX() * scale;
-        final double newMinY = coordinates.getMinY() + bounds.getY() * scale;
+        final double newMinX = coordinates.minX() + bounds.getX() * scale;
+        final double newMinY = coordinates.minY() + bounds.getY() * scale;
         final double newScale = calculateNewScale(view.getImageSize(), bounds, scale);
         final Coordinates newCoordinates = centerImage(view.getImageSize(), bounds, newScale, newMinX, newMinY);
 
@@ -175,20 +176,20 @@ class MandelController {
         TLOG.info("Number of lines = " + height + ", lines per segment = " + linesPerSegment);
 
         // Divide the coordinate space among the segments
-        Coordinates coordinates = imageAttributes.getCoordinates();
-        double coordinatesPerSegment = height * imageAttributes.getScale() / segments;
+        Coordinates coordinates = imageAttributes.coordinates();
+        double coordinatesPerSegment = height * imageAttributes.scale() / segments;
 
         List<Parameters> parametersList = new ArrayList<>();
 
         // Create parameters for all segments
         for (int s = 0; s < (segments - 1); s++) {
-            double minY = coordinates.getMinY() + (coordinatesPerSegment * s);
+            double minY = coordinates.minY() + (coordinatesPerSegment * s);
             ImageAttributes segmentAttributes = imageAttributes.withCoordinates(coordinates.withMinY(minY));
             parametersList.add(new Parameters(linesPerSegment * s, width, linesPerSegment, segmentAttributes));
         }
 
         // Assign the rest of the lines to the last segment
-        double minY = coordinates.getMinY() + (coordinatesPerSegment * (segments - 1));
+        double minY = coordinates.minY() + (coordinatesPerSegment * (segments - 1));
         ImageAttributes segmentAttributes = imageAttributes.withCoordinates(coordinates.withMinY(minY));
         int segmentHeight = height - ((segments - 1) * linesPerSegment);
         parametersList.add(new Parameters(linesPerSegment * (segments - 1), width, segmentHeight, segmentAttributes));

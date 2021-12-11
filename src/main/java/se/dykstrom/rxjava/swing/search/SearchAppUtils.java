@@ -1,12 +1,12 @@
 package se.dykstrom.rxjava.swing.search;
 
+import java.time.LocalTime;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import rx.Observable;
-
-import java.time.LocalTime;
 
 public final class SearchAppUtils {
 
@@ -19,11 +19,11 @@ public final class SearchAppUtils {
     private SearchAppUtils() { }
 
     public static String toSearchQuery(String text) {
-        return SEARCH_URL.replace("{text}",  text);
+        return SEARCH_URL.replace("{text}", text);
     }
 
     public static String toArticleQuery(String title) {
-        return ARTICLE_URL.replace("{title}", title);
+        return ARTICLE_URL.replace("{title}", title.replace(" ", "_"));
     }
 
     /**
@@ -33,7 +33,7 @@ public final class SearchAppUtils {
     public static Observable<String> titleObs(String json) {
         return Observable.create(subscriber -> {
             try {
-                JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
+                JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
                 JsonObject query = jsonObject.get("query").getAsJsonObject();
                 JsonArray search = query.get("search").getAsJsonArray();
                 int size = search.size();
@@ -60,7 +60,6 @@ public final class SearchAppUtils {
     }
 
     public static void log(String msg, Throwable throwable) {
-        msg += (throwable.getCause() != null) ? ", caused by: " + throwable.getCause() : "";
-        log(msg);
+        log(msg + ((throwable.getCause() != null) ? ", caused by: " + throwable.getCause() : ""));
     }
 }

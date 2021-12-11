@@ -1,9 +1,9 @@
 package se.dykstrom.rxjava;
 
-import rx.Observable;
-
 import java.util.Collection;
 import java.util.HashSet;
+
+import rx.Observable;
 
 public class Primes {
 
@@ -18,7 +18,7 @@ public class Primes {
     }
 
     private static boolean isPrime(Integer integer, Collection<Integer> primes) {
-        return !primes.stream().anyMatch(prime -> integer % prime == 0);
+        return primes.stream().noneMatch(prime -> integer % prime == 0);
     }
 
     public static Observable<Integer> primesKarl(Integer to) {

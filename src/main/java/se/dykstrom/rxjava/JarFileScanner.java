@@ -1,14 +1,14 @@
 package se.dykstrom.rxjava;
 
-import rx.Observable;
-import rx.schedulers.Schedulers;
-import se.dykstrom.rxjava.common.DirectoryStreamObservable;
-import se.dykstrom.rxjava.common.ZipObservable;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.CountDownLatch;
 import java.util.zip.ZipEntry;
+
+import rx.Observable;
+import rx.schedulers.Schedulers;
+import se.dykstrom.rxjava.common.DirectoryStreamObservable;
+import se.dykstrom.rxjava.common.ZipObservable;
 
 /**
  * A program that scans a directory recursively for jar files, and for each jar file found,
@@ -17,7 +17,7 @@ import java.util.zip.ZipEntry;
 public class JarFileScanner {
 
     public static void main(String[] args) throws Exception {
-        String directoryName = args.length == 1 ? args[0] : "c:/dev/maven";
+        String directoryName = args.length == 1 ? args[0] : "target";
         Path directoryPath = Paths.get(directoryName);
 
         Observable<Path> jarFiles = listJarFilesObs(directoryPath);
@@ -44,7 +44,7 @@ public class JarFileScanner {
                 .observeOn(Schedulers.io())
                 .count()
                 .doOnNext(count -> log(count, jarFile.toString())))
-                .reduce((value, acc) -> value + acc);
+                .reduce(Integer::sum);
     }
 
     /**
@@ -53,7 +53,7 @@ public class JarFileScanner {
     public static Observable<String> classFileObs(Path jarFile) {
         return ZipObservable.fromPath(jarFile)
                 .doOnError(throwable -> System.err.println("Failed to read " + jarFile + ": " + throwable))
-                .onErrorResumeNext(Observable.<ZipEntry>empty())
+                .onErrorResumeNext(Observable.empty())
                 .filter(zipEntry -> !zipEntry.isDirectory())
                 .map(ZipEntry::getName)
                 .filter(name -> name.endsWith(".class"));

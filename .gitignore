@@ -16,4 +16,5 @@ hs_err_pid*
 
 # Idea Intellij
 .idea/
+.run/
 *.iml

@@ -11,7 +11,7 @@ import javax.swing.*;
  * @author Johan Dykstrom
  */
 class Mandel {
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         int segments = (args.length > 0) ? Integer.parseInt(args[0]) : 1;
         SwingUtilities.invokeLater(() -> {
             MandelView view = new MandelView();

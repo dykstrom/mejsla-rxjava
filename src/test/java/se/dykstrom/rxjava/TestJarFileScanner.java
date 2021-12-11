@@ -1,10 +1,8 @@
 package se.dykstrom.rxjava;
 
-import org.junit.Test;
-import rx.Observable;
-import rx.observers.TestSubscriber;
-
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,6 +10,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import org.junit.Test;
+import rx.Observable;
+import rx.observers.TestSubscriber;
 
 import static org.junit.Assert.assertTrue;
 import static se.dykstrom.rxjava.common.utils.Utils.createZipFile;
@@ -71,7 +73,7 @@ public class TestJarFileScanner {
     }
 
     @Test
-    public void testClassFileObs_IOException() throws Exception {
+    public void testClassFileObs_IOException() {
         Path path = Paths.get("c:/Temp/does-not-exist.zip");
         String encoding = StandardCharsets.UTF_8.name();
 
@@ -87,7 +89,7 @@ public class TestJarFileScanner {
                 observable.subscribe(subscriber);
                 subscriber.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS);
 
-                assertTrue(outputStream.toString(encoding).contains("FileNotFoundException"));
+                assertTrue(outputStream.toString(encoding).contains("NoSuchFileException"));
                 subscriber.assertNoValues();
                 subscriber.assertNoErrors();
             } catch (Exception e) {

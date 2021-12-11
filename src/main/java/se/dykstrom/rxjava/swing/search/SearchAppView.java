@@ -1,15 +1,27 @@
 package se.dykstrom.rxjava.swing.search;
 
-import rx.Observable;
-import se.dykstrom.rxjava.swing.common.RxSwingUtils;
-
-import javax.swing.*;
+import javax.swing.AbstractListModel;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import rx.Observable;
+import se.dykstrom.rxjava.swing.common.RxSwingUtils;
 
 import static se.dykstrom.rxjava.swing.search.SearchAppUtils.log;
 
@@ -104,9 +116,14 @@ public class SearchAppView extends JFrame {
      */
     public void setResults(List<String> searchResults) {
         List<String> list = new ArrayList<>(searchResults);
-        resultList.setModel(new AbstractListModel<String>() {
-            public int getSize() { return list.size(); }
-            public String getElementAt(int i) { return list.get(i); }
+        resultList.setModel(new AbstractListModel<>() {
+            public int getSize() {
+                return list.size();
+            }
+
+            public String getElementAt(int i) {
+                return list.get(i);
+            }
         });
         resultList.ensureIndexIsVisible(0);
     }
